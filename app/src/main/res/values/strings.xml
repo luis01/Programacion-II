@@ -1,10 +1,11 @@
 <resources>
-    <string name="app_name">Calculadora Basica</string>
-    <string-array name="operacionesBasicas">
-        <item>Suma</item>
-        <item>Resta</item>
-        <item>Multiplicacion</item>
-        <item>Division</item>
-        <item>Factorial</item>
+    <string name="app_name">Conversor de Unidades</string>
+    <string-array name="conversorMonedas">
+        <item>Dolar</item>
+        <item>Colon SV</item>
+        <item>Quetzal</item>
+        <item>Lempira</item>
+        <item>Cordoba</item>
+        <item>Colon (Costa Rica)</item>
     </string-array>
 </resources>
