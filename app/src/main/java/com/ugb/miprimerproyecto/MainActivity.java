@@ -1,10 +1,14 @@
 package com.ugb.miprimerproyecto;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
@@ -25,6 +29,37 @@ public class MainActivity extends AppCompatActivity {
     Spinner spnOpcionDe, spnOpcionA;
     conversores miConversor = new conversores();
     RelativeLayout contenidoView;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.mnx_conversor,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Toast.makeText(getApplicationContext(),"Index: "+ item, Toast.LENGTH_LONG).show();
+        int idMenu = item.getItemId();
+        switch (idMenu){
+            case R.id.mnxMoneda:
+                tbhConversores.setCurrentTab(0);
+                break;
+
+            case R.id.mnxLongitud:
+                tbhConversores.setCurrentTab(1);
+                break;
+
+            case R.id.mnxMasa:
+                tbhConversores.setCurrentTab(2);
+                break;
+
+            case R.id.mnxAlmacenamiento:
+                tbhConversores.setCurrentTab(3);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,10 +69,11 @@ public class MainActivity extends AppCompatActivity {
         tbhConversores = findViewById(R.id.tbhConversores);
         tbhConversores.setup();
 
-        tbhConversores.addTab(tbhConversores.newTabSpec("Monedas").setContent(R.id.tabMonedas).setIndicator("M"));
-        tbhConversores.addTab(tbhConversores.newTabSpec("Longitud").setContent(R.id.tabLongitud).setIndicator("L"));
-        tbhConversores.addTab(tbhConversores.newTabSpec("Masa").setContent(R.id.tabMasa).setIndicator("P"));
-
+        tbhConversores.addTab(tbhConversores.newTabSpec("Monedas").setContent(R.id.tabMonedas).setIndicator("",getResources().getDrawable(R.drawable.ic_money)));
+        tbhConversores.addTab(tbhConversores.newTabSpec("Longitud").setContent(R.id.tabLongitud).setIndicator("",getResources().getDrawable(R.drawable.ic_ruler)));
+        tbhConversores.addTab(tbhConversores.newTabSpec("Masa").setContent(R.id.tabMasa).setIndicator("",getResources().getDrawable(R.drawable.ic_peso)));
+        tbhConversores.addTab(tbhConversores.newTabSpec("Almacenamiento").setContent(R.id.tabAlmacenamiento).setIndicator("",getResources().getDrawable(R.drawable.ic_save)));
+        tbhConversores.addTab(tbhConversores.newTabSpec("Almacenamientos").setContent(R.id.tabAlmacenamiento).setIndicator("",getResources().getDrawable(R.drawable.selec_money)));
         btnConvertir = findViewById(R.id.btnCalcular);
         btnConvertir.setOnClickListener(new View.OnClickListener() {
             @Override

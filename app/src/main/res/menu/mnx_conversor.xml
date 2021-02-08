@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/mnxMoneda" android:title="Monedas" />
+    <item android:id="@+id/mnxLongitud" android:title="Longitud" />
+    <item android:id="@+id/mnxMasa" android:title="Masa" />
+    <item android:id="@+id/mnxAlmacenamiento" android:title="Almacenamineto" />
+</menu>
