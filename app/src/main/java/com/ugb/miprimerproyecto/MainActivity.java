@@ -67,8 +67,8 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 intent = new Intent(MainActivity.this, ReproducirCancion.class);
                 Bundle enviarDatos = new Bundle();
-                enviarDatos.putInt("posicion",position);
-                //enviarDatos.putStringArrayList("canciones",);
+                enviarDatos.putLong("idCancion", cancionesVector.get(position).getId() );
+                enviarDatos.putString("titulo",cancionesVector.get(position).getTitle());
                 intent.putExtras(enviarDatos);
                 startActivity(intent);
             }

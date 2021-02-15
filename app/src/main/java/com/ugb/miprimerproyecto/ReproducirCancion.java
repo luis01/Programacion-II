@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,32 +19,24 @@ import java.util.Vector;
 
 public class ReproducirCancion extends AppCompatActivity {
     Uri uri; //Uri -> Identificador Unico de Recursos.
-    Vector<Canciones> cancionesVector = new Vector<Canciones>();
-    int posicion;
+    long idCancion;
     Button btnAcciones;
     TextView tempVal;
     MediaPlayer mp;
+    ImageButton btnAtras;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reproducir_cancion);
         try {
-            Bundle recibirPosicion = getIntent().getExtras();
-            posicion = recibirPosicion.getInt("posicion");
-            if (posicion >= 0) {
+            Bundle recibirDatos = getIntent().getExtras();
+            idCancion = recibirDatos.getLong("idCancion");
+            if (idCancion>0) {
                 tempVal = findViewById(R.id.lblTitulo);
-                tempVal.setText(cancionesVector.get(posicion).getTitle());
+                tempVal.setText( recibirDatos.getString("titulo") );
 
-                mp = new MediaPlayer();
-                uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, cancionesVector.get(posicion).getId());
-                mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                try {
-                    mp.setDataSource(getApplicationContext(), uri);
-                    mp.prepare();
-                } catch (Exception ex) {
-                    Toast.makeText(getApplicationContext(), "Error: " + ex.getMessage(), Toast.LENGTH_LONG).show();
-                }
+                preparCancion();
             }
         }catch (Exception e){
             Toast.makeText(getApplicationContext(), "Error: "+ e.getMessage(), Toast.LENGTH_LONG).show();
@@ -52,6 +45,9 @@ public class ReproducirCancion extends AppCompatActivity {
             btnAcciones.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if( mp==null ){
+                        preparCancion();
+                    }
                     mp.start();
                 }
             });
@@ -67,8 +63,29 @@ public class ReproducirCancion extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     mp.stop();
+                    mp = null;
                 }
             });
 
+            btnAtras = findViewById(R.id.btnAtras);
+            btnAtras.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent principal = new Intent(ReproducirCancion.this, MainActivity.class);
+                    startActivity(principal);
+                }
+            });
+
+    }
+    private void preparCancion(){
+        mp = new MediaPlayer();
+        uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, idCancion);
+        mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        try {
+            mp.setDataSource(getApplicationContext(), uri);
+            mp.prepare();
+        } catch (Exception ex) {
+            Toast.makeText(getApplicationContext(), "Error: " + ex.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 }
