@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        tempVal = findViewById(R.id.lblSensorProximidad);
+        tempVal = findViewById(R.id.lblSensorAcelerometro);
         activarSensorProximidad();
     }
 
@@ -42,24 +42,16 @@ public class MainActivity extends AppCompatActivity {
     }
     private void activarSensorProximidad(){
         sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
-        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         if( sensor==null ){
-            Toast.makeText(getApplicationContext(), "No dispones de sensor de Proximidad", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "No dispones de sensor de Acelerometro", Toast.LENGTH_LONG).show();
             finish();
         }
         sensorEventListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
-                tempVal.setText( "Valor: "+event.values[0] );
-                if( event.values[0]<4 ){
-                    getWindow().getDecorView().setBackgroundColor(Color.BLACK);
-                } else if( event.values[0]>=4 && event.values[0]<=8 ){
-                    getWindow().getDecorView().setBackgroundColor(Color.parseColor("#FDE7D6"));
-                } else{//solo si es mayor de 8
-                    getWindow().getDecorView().setBackgroundColor(Color.parseColor("#D6FDDF"));
-                }
+                tempVal.setText( "Valor: X:"+event.values[0] +"; Y: "+event.values[1] +"; Z: "+event.values[2] );
             }
-
             @Override
             public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
