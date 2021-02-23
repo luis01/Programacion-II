@@ -15,8 +15,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Vector;
-
 public class ReproducirCancion extends AppCompatActivity {
     Uri uri; //Uri -> Identificador Unico de Recursos.
     long idCancion;
@@ -67,7 +65,7 @@ public class ReproducirCancion extends AppCompatActivity {
                 }
             });
 
-            btnAtras = findViewById(R.id.btnAtras);
+            btnAtras = findViewById(R.id.btn_Atras);
             btnAtras.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

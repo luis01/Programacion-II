@@ -4,49 +4,82 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background"
     tools:context=".ReproducirCancion">
 
     <ImageButton
-        android:id="@+id/btnAtras"
+        android:id="@+id/btn_Atras"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:src="@drawable/abc_vector_test" />
+        android:layout_marginStart="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"
+        android:contentDescription="@android:string/selectAll"
+        android:src="@drawable/abc_vector_test"
+        android:tint="@color/teal_700" />
+
     <TextView
         android:id="@+id/lblTitulo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Titulo de la cancion"
+        android:layout_marginStart="30dp"
+        android:layout_marginLeft="30dp"
         android:layout_marginTop="120dp"
-        android:layout_marginLeft="20dp"
-        />
+        android:text="Titulo de la cancion"
+        android:textColor="@color/white" />
 
     <Button
         android:id="@+id/btnPlay"
-        android:layout_below="@id/lblTitulo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="PLAY"
+        android:layout_below="@id/lblTitulo"
+        android:layout_marginStart="30dp"
+        android:layout_marginLeft="30dp"
         android:layout_marginTop="80dp"
-        android:layout_marginLeft="20dp"
-        />
+        app:backgroundTint="@color/teal_700"
+        app:icon="@drawable/reproducir" />
 
     <Button
         android:id="@+id/btnPause"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="PAUSE"
         android:layout_below="@id/lblTitulo"
+        android:layout_marginStart="150dp"
+        android:layout_marginLeft="150dp"
         android:layout_marginTop="80dp"
-        android:layout_marginLeft="140dp"/>
+        app:backgroundTint="@color/teal_700"
+        app:icon="@drawable/pausa" />
 
     <Button
         android:id="@+id/btnStop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="STOP"
         android:layout_below="@id/lblTitulo"
+        android:layout_marginStart="270dp"
+        android:layout_marginLeft="270dp"
         android:layout_marginTop="80dp"
-        android:layout_marginLeft="260dp"
-        />
+        app:backgroundTint="@color/teal_700"
+        app:icon="@drawable/detener" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="19dp"
+        android:layout_marginLeft="19dp"
+        android:layout_marginTop="342dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="70dp"
+        android:contentDescription="@string/app_name"
+        app:srcCompat="@drawable/portada1" />
 </RelativeLayout>
