@@ -1,11 +1,3 @@
 <resources>
-    <string name="app_name">Conversor de Unidades</string>
-    <string-array name="tipo">
-        <item>Monedas</item>
-        <item>Longitud</item>
-        <item>Masa</item>
-        <item>Volumen</item>
-        <item>Datos</item>
-        <item>Tiempo</item>
-    </string-array>
+    <string name="app_name">Sensor GPS</string>
 </resources>
