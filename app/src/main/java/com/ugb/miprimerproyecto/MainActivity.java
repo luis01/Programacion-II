@@ -10,6 +10,8 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -23,12 +25,10 @@ import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
 public class MainActivity extends AppCompatActivity {
-    TabHost tbhConversores;
     Button btnConvertir;
     TextView tempVal;
-    Spinner spnOpcionDe, spnOpcionA;
+    Spinner spnTipo, spnOpcionDe, spnOpcionA;
     conversores miConversor = new conversores();
-    RelativeLayout contenidoView;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -42,19 +42,19 @@ public class MainActivity extends AppCompatActivity {
         int idMenu = item.getItemId();
         switch (idMenu){
             case R.id.mnxMoneda:
-                tbhConversores.setCurrentTab(0);
+
                 break;
 
             case R.id.mnxLongitud:
-                tbhConversores.setCurrentTab(1);
+
                 break;
 
             case R.id.mnxMasa:
-                tbhConversores.setCurrentTab(2);
+
                 break;
 
             case R.id.mnxAlmacenamiento:
-                tbhConversores.setCurrentTab(3);
+
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -65,66 +65,57 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        contenidoView = findViewById(R.id.contenidoView);
-        tbhConversores = findViewById(R.id.tbhConversores);
-        tbhConversores.setup();
-
-        tbhConversores.addTab(tbhConversores.newTabSpec("Monedas").setContent(R.id.tabMonedas).setIndicator("",getResources().getDrawable(R.drawable.ic_money)));
-        tbhConversores.addTab(tbhConversores.newTabSpec("Longitud").setContent(R.id.tabLongitud).setIndicator("",getResources().getDrawable(R.drawable.ic_ruler)));
-        tbhConversores.addTab(tbhConversores.newTabSpec("Masa").setContent(R.id.tabMasa).setIndicator("",getResources().getDrawable(R.drawable.ic_peso)));
-        tbhConversores.addTab(tbhConversores.newTabSpec("Almacenamiento").setContent(R.id.tabAlmacenamiento).setIndicator("",getResources().getDrawable(R.drawable.ic_save)));
-        tbhConversores.addTab(tbhConversores.newTabSpec("Almacenamientos").setContent(R.id.tabAlmacenamiento).setIndicator("",getResources().getDrawable(R.drawable.selec_money)));
-        btnConvertir = findViewById(R.id.btnCalcular);
-        btnConvertir.setOnClickListener(new View.OnClickListener() {
+        spnOpcionDe = findViewById(R.id.cboDeL);
+        spnOpcionA = findViewById(R.id.cboAL);
+        spnTipo = findViewById(R.id.cboTipo);
+        spnTipo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onClick(View v) {
-                try {
-                    tempVal = (TextView) findViewById(R.id.txtcantidad);
-                    double cantidad = Double.parseDouble(tempVal.getText().toString());
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                spnOpcionDe.setAdapter(new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item,miConversor.obtenerTipo(position)));
+                spnOpcionA.setAdapter(new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item,miConversor.obtenerTipo(position)));
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
 
-                    spnOpcionDe = findViewById(R.id.cboDe);
-                    spnOpcionA = findViewById(R.id.cboA);
-                    tempVal = findViewById(R.id.lblRespuesta);
-                    tempVal.setText("Respuesta: " + miConversor.convertir(0, spnOpcionDe.getSelectedItemPosition(), spnOpcionA.getSelectedItemPosition(), cantidad));
-                }catch (Exception e){
-                    tempVal = findViewById(R.id.lblRespuesta);
-                    tempVal.setText("Por favor ingrese los valores correspondiente");
-                    Toast.makeText(getApplicationContext(), "Por ingrese los valores correspondiente "+ e.getMessage(),Toast.LENGTH_SHORT).show();
-                    /*Snackbar snackbar = Snackbar.make(contenidoView, "Por favor ingrese los valores correspondiente", Snackbar.LENGTH_LONG);
-                    snackbar.show();*/
-                }
             }
         });
+
         btnConvertir = findViewById(R.id.btnCalcularL);
         btnConvertir.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    tempVal = findViewById(R.id.txtCantidadL);
-                    double cantidad = Double.parseDouble(tempVal.getText().toString());
+                tempVal = (TextView) findViewById(R.id.txtCantidadL);
+                double cantidad = Double.parseDouble(tempVal.getText().toString());
 
-                    spnOpcionDe = findViewById(R.id.cboDeL);
-                    spnOpcionA = findViewById(R.id.cboAL);
-                    tempVal = findViewById(R.id.lblRespuestaL);
-
-                    tempVal.setText("Respuesta: " + miConversor.convertir(1, spnOpcionDe.getSelectedItemPosition(), spnOpcionA.getSelectedItemPosition(), cantidad));
-                }catch (Exception e){
-                    tempVal = findViewById(R.id.lblRespuestaL);
-                    tempVal.setText("Por favor ingrese los valores correspondiente");
-                    Toast.makeText(getApplicationContext(), "Por ingrese los valores correspondiente "+ e.getMessage(),Toast.LENGTH_SHORT).show();
-                }
+                spnOpcionDe = findViewById(R.id.cboDeL);
+                spnOpcionA = findViewById(R.id.cboAL);
+                tempVal = findViewById(R.id.lblRespuestaL);
+                tempVal.setText("Respuesta: " + miConversor.convertir(spnTipo.getSelectedItemPosition(), spnOpcionDe.getSelectedItemPosition(), spnOpcionA.getSelectedItemPosition(), cantidad));
             }
         });
-
     }
 }
 
 class conversores{
+    String [][] etiquetas = {
+            {"Dolar","Colon SV","Quetzal","Lempira","Cordoba","Colon CR"}, /*Monedas*/
+            {"Mts","CM","Pulgadas","Pies"}, /*Longitud*/
+            {"Libra","Miligramos","Gramos","Kilogramos","Onzas"}, /*Masa*/
+            {"Litros","Tazas", "Galones","Cucharadas"}, /*Volumen*/
+            {"Megabyte","Bits","Byte","Kilobyte","Gigabyte","Terabyte"}, /*Almacenamiento*/
+            {"Hora","Milisegundo","Segundo","Minutos","Dia","Semana"}, /*Tiempo*/
+    };
     double[][] conversor = {
         {1.0,8.75,7.77, 24.03,34.8,611.10},/*Monedas*/
         {1.0, 100.0,39.37,3.28},/*Longitud*/
-            {1.0}/*Masa*/
+            {1.0,453592.4,453.5924,0.453592,16}, /*Masa*/
+            {1.0,4.226753,0.264172,56.31213}, /*Volumen*/
+            {1.0,8000000,1000000,1024,0.001,0.000001}, /*Almacenamiento*/
+            {1.0,3600000,3600,60,0.041667,0.005952} /*Tiempo*/
     };
+    public String[] obtenerTipo(int opcion){
+        return etiquetas[opcion];
+    }
     public double convertir(int opcion, int de, int a, double cantidad){
         return conversor[opcion][a] / conversor[opcion][de] * cantidad;
     }
