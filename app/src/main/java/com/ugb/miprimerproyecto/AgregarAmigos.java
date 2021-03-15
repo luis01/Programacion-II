@@ -11,7 +11,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -24,13 +26,17 @@ public class AgregarAmigos extends AppCompatActivity {
     FloatingActionButton btnAtras;
     ImageView imgFotoAmigo;
     Intent tomarFotoIntent;
-    String urlCompletaImg;
+    String urlCompletaImg, idAmigo,accion="nuevo";
+    Button btn;
+    DB miBD;
+    TextView tempVal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_agregar_amigos);
 
+        miBD = new DB(getApplicationContext(),"",null,1);
         btnAtras = findViewById(R.id.btnAtras);
         btnAtras.setOnClickListener(v->{
             mostrarVistaPrincipal();
@@ -38,6 +44,26 @@ public class AgregarAmigos extends AppCompatActivity {
         imgFotoAmigo = findViewById(R.id.imgFotoAmigo);
         imgFotoAmigo.setOnClickListener(v->{
             tomarFotoAmigo();
+        });
+        btn = findViewById(R.id.btnGuardarAmigo);
+        btn.setOnClickListener(v->{
+            tempVal = findViewById(R.id.txtNombre);
+            String nombre = tempVal.getText().toString();
+
+            tempVal = findViewById(R.id.txtTelefono);
+            String tel = tempVal.getText().toString();
+
+            tempVal = findViewById(R.id.txtDireccion);
+            String direccion = tempVal.getText().toString();
+
+            tempVal = findViewById(R.id.txtEmail);
+            String email = tempVal.getText().toString();
+
+            String[] datos = {idAmigo,nombre,tel,direccion,email,urlCompletaImg};
+            miBD.administracion_amigos(accion,datos);
+            mostrarMsgToast("Registro guardado con exito.");
+
+            mostrarVistaPrincipal();
         });
     }
     private void mostrarVistaPrincipal(){
