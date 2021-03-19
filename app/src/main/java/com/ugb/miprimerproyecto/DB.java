@@ -33,6 +33,11 @@ public class DB extends SQLiteOpenHelper {
 
             case "nuevo":
                 sqLiteDatabaseW.execSQL("INSERT INTO tblamigos(nombre,telefono,direccion,email,urlPhoto) VALUES ('"+datos[1]+"','"+datos[2]+"','"+datos[3]+"','"+datos[4]+"','"+datos[5]+"')");
+                break;
+
+            case "modificar":
+                sqLiteDatabaseW.execSQL("UPDATE tblamigos SET nombre='"+datos[1]+"',telefono='"+datos[2]+"',direccion='"+datos[3]+"',email='"+datos[4]+"',urlPhoto='"+datos[5]+"' WHERE idAmigo='"+datos[0]+"'");
+                break;
         }
         return datosCursor;
     }

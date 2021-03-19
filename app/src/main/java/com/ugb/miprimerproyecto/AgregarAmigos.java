@@ -65,6 +65,36 @@ public class AgregarAmigos extends AppCompatActivity {
 
             mostrarVistaPrincipal();
         });
+        mostrarDatosAmigos();
+    }
+    private void mostrarDatosAmigos() {
+        try{
+            Bundle recibirParametros = getIntent().getExtras();
+            accion = recibirParametros.getString("accion");
+            if(accion.equals("modificar")){
+                String[] datos = recibirParametros.getStringArray("datos");
+
+                idAmigo = datos[0];
+
+                tempVal = findViewById(R.id.txtNombre);
+                tempVal.setText(datos[1]);
+
+                tempVal = findViewById(R.id.txtTelefono);
+                tempVal.setText(datos[2]);
+
+                tempVal = findViewById(R.id.txtDireccion);
+                tempVal.setText(datos[3]);
+
+                tempVal = findViewById(R.id.txtEmail);
+                tempVal.setText(datos[4]);
+
+                urlCompletaImg = datos[5];
+                Bitmap bitmap = BitmapFactory.decodeFile((urlCompletaImg));
+                imgFotoAmigo.setImageBitmap(bitmap);
+            }
+        }catch (Exception e){
+            mostrarMsgToast(e.getMessage());
+        }
     }
     private void mostrarVistaPrincipal(){
         Intent iprincipal = new Intent(getApplicationContext(), MainActivity.class);
