@@ -3,6 +3,8 @@ package com.ugb.miprimerproyecto;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -56,23 +58,51 @@ public class MainActivity extends AppCompatActivity {
     }
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.mnxAgregar:
-                agregarAmigos("nuevo", new String[]{});
-                break;
-            case R.id.mnxModificar:
-                String[] datos = {
-                        datosAmigosCursor.getString(0),//idAmigo
-                        datosAmigosCursor.getString(1),//nombre
-                        datosAmigosCursor.getString(2),//telefono
-                        datosAmigosCursor.getString(3),//direccion
-                        datosAmigosCursor.getString(4), //email
-                        datosAmigosCursor.getString(5) //url photo
-                };
-                agregarAmigos("modificar",datos);
-                break;
+        try {
+            switch (item.getItemId()) {
+                case R.id.mnxAgregar:
+                    agregarAmigos("nuevo", new String[]{});
+                    break;
+                case R.id.mnxModificar:
+                    String[] datos = {
+                            datosAmigosCursor.getString(0),//idAmigo
+                            datosAmigosCursor.getString(1),//nombre
+                            datosAmigosCursor.getString(2),//telefono
+                            datosAmigosCursor.getString(3),//direccion
+                            datosAmigosCursor.getString(4), //email
+                            datosAmigosCursor.getString(5) //url photo
+                    };
+                    agregarAmigos("modificar", datos);
+                    break;
+                case R.id.mnxEliminar:
+                    eliminarAmigo();
+                    break;
+            }
+        }catch (Exception ex){
+            mostrarMsgToask(ex.getMessage());
         }
         return super.onContextItemSelected(item);
+    }
+    private void eliminarAmigo(){
+        try {
+            AlertDialog.Builder confirmacion = new AlertDialog.Builder(MainActivity.this);
+            confirmacion.setTitle("Esta seguro de eliminar el registro?");
+            confirmacion.setMessage(datosAmigosCursor.getString(1));
+            confirmacion.setPositiveButton("Si", (dialog, which) -> {
+                miBD = new DB(getApplicationContext(), "", null, 1);
+                datosAmigosCursor = miBD.administracion_amigos("eliminar", new String[]{datosAmigosCursor.getString(0)});//idAmigo
+                obtenerDatosAmigos();
+                mostrarMsgToask("Registro Eliminado con exito...");
+                dialog.dismiss();//cerrar el cuadro de dialogo
+            });
+            confirmacion.setNegativeButton("No", (dialog, which) -> {
+                mostrarMsgToask("Eliminacion cancelada por el usuario...");
+                dialog.dismiss();
+            });
+            confirmacion.create().show();
+        }catch (Exception ex){
+            mostrarMsgToask(ex.getMessage());
+        }
     }
     private void buscarAmigos() {
         TextView tempVal = findViewById(R.id.txtBuscarAmigos);
@@ -90,7 +120,17 @@ public class MainActivity extends AppCompatActivity {
                     } else {//si esta buscando entonces filtramos los datos
                         for (amigos am : amigosArrayListCopy){
                             String nombre = am.getNombre();
-                            if(nombre.toLowerCase().contains(tempVal.getText().toString().trim().toLowerCase())){
+                            String tel = am.getTelefono();
+                            String email = am.getEmail();
+                            String direccion = am.getDireccion();
+
+                            String buscando = tempVal.getText().toString().trim().toLowerCase();//escribe en la caja de texto...
+
+                            if(nombre.toLowerCase().trim().contains(buscando) ||
+                                tel.trim().contains(buscando) ||
+                                email.trim().toLowerCase().contains(buscando) ||
+                                    direccion.trim().toLowerCase().contains(buscando)
+                            ){
                                 amigosArrayList.add(am);
                             }
                         }
