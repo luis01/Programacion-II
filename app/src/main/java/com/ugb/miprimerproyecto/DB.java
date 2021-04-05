@@ -26,8 +26,8 @@ public class DB extends SQLiteOpenHelper {
         //NO, porque es para migrar o actualizar a una nueva version...
     }
     public Cursor administracion_amigos(String accion, String[] datos){
+        Cursor datosCursor = null;
         try {
-            Cursor datosCursor = null;
             SQLiteDatabase sqLiteDatabaseW = getWritableDatabase();
             SQLiteDatabase sqLiteDatabaseR = getReadableDatabase();
             switch (accion) {
@@ -47,7 +47,7 @@ public class DB extends SQLiteOpenHelper {
             return datosCursor;
         }catch (Exception e){
             Toast.makeText(miContext, "Error en la administracion de la BD "+ e.getMessage(), Toast.LENGTH_LONG).show();
-            return null;
+            return datosCursor;
         }
     }
 }
