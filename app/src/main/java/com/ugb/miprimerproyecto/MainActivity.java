@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -24,6 +25,8 @@ import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<amigos> amigosArrayList=new ArrayList<amigos>();
     ArrayList<amigos> amigosArrayListCopy=new ArrayList<amigos>();
     amigos misAmigos;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         btn.setOnClickListener(v->{
            agregarAmigos("nuevo", new String[]{});
         });
-        obtenerDatosAmigos();
+        obtenerDatosServer();
         buscarAmigos();
     }
     @Override
@@ -194,6 +198,22 @@ public class MainActivity extends AppCompatActivity {
     }
     private void mostrarMsgToask(String msg){
         Toast.makeText(getApplicationContext(),msg,Toast.LENGTH_LONG).show();
+    }
+}
+class obtenerDatosServer extends AsyncTask<Void, Void, String>{
+    HttpURLConnection urlConnection;
+    @Override
+    protected String doInBackground(Void... voids) {
+        StringBuilder result = new StringBuilder();
+        try{
+            URL url = new URL(utilidades.urlServer);
+            urlConnection = (HttpURLConnection)url.openConnection();
+            urlConnection.setRequestMethod("GET");
+
+        }catch (Exception e){
+            //
+        }
+        return null;
     }
 }
 class amigos{

@@ -30,6 +30,7 @@ public class AgregarAmigos extends AppCompatActivity {
     Button btn;
     DB miBD;
     TextView tempVal;
+    utilidades miUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
