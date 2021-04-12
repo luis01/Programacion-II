@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,6 +26,13 @@ import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -37,7 +45,9 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<amigos> amigosArrayList=new ArrayList<amigos>();
     ArrayList<amigos> amigosArrayListCopy=new ArrayList<amigos>();
     amigos misAmigos;
-
+    JSONArray jsonArrayDatosAmigos;
+    JSONObject jsonObjectDatosAmigos;
+    utilidades u;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         btn.setOnClickListener(v->{
            agregarAmigos("nuevo", new String[]{});
         });
-        obtenerDatosServer();
+        obtenerDatosAmigos();
         buscarAmigos();
     }
     @Override
@@ -164,17 +174,67 @@ public class MainActivity extends AppCompatActivity {
             mostrarMsgToask(e.getMessage());
         }
     }
-    private void obtenerDatosAmigos(){
+    private void obtenerDatosAmigosOffLine(){
         miBD = new DB(getApplicationContext(),"",null,1);
         datosAmigosCursor = miBD.administracion_amigos("consultar",null);
         if( datosAmigosCursor.moveToFirst() ){//si hay datos que mostrar
-            mostrarDatosAmigos();
+            mostrarDatosAmigosOffLine();
         } else {//sino que llame para agregar nuevos amigos...
             mostrarMsgToask("No hay datos de amigos que mostrar, por favor agregue nuevos amigos...");
             agregarAmigos("nuevo", new String[]{});
         }
     }
-    private void mostrarDatosAmigos(){
+    private void obtenerDatosAmigosOnLine(){
+        try {
+            ConexionServer conexionServer = new ConexionServer();
+            String resp = conexionServer.execute(u.urlServer, "GET").get();
+
+            jsonObjectDatosAmigos=new JSONObject(resp);
+            jsonArrayDatosAmigos = jsonObjectDatosAmigos.getJSONArray("rows");
+            mostrarDatosAmigosOnLine();
+        }catch (Exception ex){
+            mostrarMsgToask(ex.getMessage());
+        }
+    }
+    private void obtenerDatosAmigos(){
+        //si tengo internet obtener datos amigos online, sino, obtener datos amigos offline
+        obtenerDatosAmigosOnLine();
+    }
+    private void mostrarDatosAmigosOnLine(){
+        try{
+            if(jsonArrayDatosAmigos.length()>0){
+                ltsAmigos = findViewById(R.id.ltsamigos);
+                amigosArrayList.clear();
+                amigosArrayListCopy.clear();
+
+                JSONObject jsonObject;
+                for(int i=0; i<jsonArrayDatosAmigos.length(); i++){
+                    jsonObject=jsonArrayDatosAmigos.getJSONObject(i).getJSONObject("value");
+                    misAmigos = new amigos(
+                            jsonObject.getString("_id"),
+                            jsonObject.getString("nombre"),
+                            jsonObject.getString("telefono"),
+                            jsonObject.getString("direccion"),
+                            jsonObject.getString("email"),
+                            jsonObject.getString("urlPhoto")
+                    );
+                    amigosArrayList.add(misAmigos);
+                }
+                adaptadorImagenes adaptadorImagenes = new adaptadorImagenes(getApplicationContext(), amigosArrayList);
+                ltsAmigos.setAdapter(adaptadorImagenes);
+
+                registerForContextMenu(ltsAmigos);
+
+                amigosArrayListCopy.addAll(amigosArrayList);
+            }else{
+                mostrarMsgToask("NO Hay Registro que mostrar");
+                agregarAmigos("nuevo", new String[]{});
+            }
+        }catch (Exception e){
+            mostrarMsgToask(e.getMessage());
+        }
+    }
+    private void mostrarDatosAmigosOffLine(){
         ltsAmigos = findViewById(R.id.ltsamigos);
         amigosArrayList.clear();
         amigosArrayListCopy.clear();
@@ -199,23 +259,38 @@ public class MainActivity extends AppCompatActivity {
     private void mostrarMsgToask(String msg){
         Toast.makeText(getApplicationContext(),msg,Toast.LENGTH_LONG).show();
     }
-}
-class obtenerDatosServer extends AsyncTask<Void, Void, String>{
-    HttpURLConnection urlConnection;
-    @Override
-    protected String doInBackground(Void... voids) {
-        StringBuilder result = new StringBuilder();
-        try{
-            URL url = new URL(utilidades.urlServer);
-            urlConnection = (HttpURLConnection)url.openConnection();
-            urlConnection.setRequestMethod("GET");
+    private class ConexionServer extends AsyncTask<String, String, String>{
+        HttpURLConnection urlConnection;
 
-        }catch (Exception e){
-            //
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
         }
-        return null;
+
+        @Override
+        protected String doInBackground(String... parametros) {
+            StringBuilder result = new StringBuilder();
+            try{
+                String uri = parametros[0];
+                String metodo = parametros[1];
+                URL url = new URL(uri);
+                urlConnection = (HttpURLConnection)url.openConnection();
+                urlConnection.setRequestMethod(metodo);
+
+                InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                String linea;
+                while( (linea=bufferedReader.readLine())!=null ){
+                    result.append(linea);
+                }
+            }catch (Exception e){
+                Log.i("GET", e.getMessage());
+            }
+            return result.toString();
+        }
     }
 }
+
 class amigos{
     String idAmigo;
     String nombre;

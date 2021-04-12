@@ -34,7 +34,7 @@ public class adaptadorImagenes  extends BaseAdapter {
     }
     @Override
     public long getItemId(int position) {
-        return Long.parseLong( datosAmigosArrayList.get(position).getIdAmigo() );
+        return 0;//Long.parseLong( datosAmigosArrayList.get(position).getIdAmigo() );
     }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
