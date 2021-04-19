@@ -98,15 +98,32 @@ public class MainActivity extends AppCompatActivity {
     }
     private void eliminarAmigo(){
         try {
+            jsonObjectDatosAmigos = jsonArrayDatosAmigos.getJSONObject(position).getJSONObject("value");
             AlertDialog.Builder confirmacion = new AlertDialog.Builder(MainActivity.this);
             confirmacion.setTitle("Esta seguro de eliminar el registro?");
-            confirmacion.setMessage(datosAmigosCursor.getString(1));
+            confirmacion.setMessage(jsonObjectDatosAmigos.getString("nombre"));
             confirmacion.setPositiveButton("Si", (dialog, which) -> {
-                miBD = new DB(getApplicationContext(), "", null, 1);
-                datosAmigosCursor = miBD.administracion_amigos("eliminar", new String[]{datosAmigosCursor.getString(0)});//idAmigo
-                obtenerDatosAmigos();
-                mostrarMsgToask("Registro Eliminado con exito...");
-                dialog.dismiss();//cerrar el cuadro de dialogo
+                try {
+                    if(di.hayConexionInternet()){
+                        ConexionServer objEliminarAmigo = new ConexionServer();
+                        String resp =  objEliminarAmigo.execute(u.url_mto +
+                                        jsonObjectDatosAmigos.getString("_id")+ "?rev="+
+                                        jsonObjectDatosAmigos.getString("_rev"), "DELETE"
+                        ).get();
+                        JSONObject jsonRespEliminar = new JSONObject(resp);
+                        if(jsonRespEliminar.getBoolean("ok")){
+                            jsonArrayDatosAmigos.remove(position);
+                            mostrarDatosAmigos();
+                        }
+                    }
+                    miBD = new DB(getApplicationContext(), "", null, 1);
+                    datosAmigosCursor = miBD.administracion_amigos("eliminar", new String[]{jsonObjectDatosAmigos.getString("_id")});//idAmigo
+                    obtenerDatosAmigos();
+                    mostrarMsgToask("Registro Eliminado con exito...");
+                    dialog.dismiss();//cerrar el cuadro de dialogo
+                }catch (Exception e){
+                    mostrarMsgToask(e.getMessage());
+                }
             });
             confirmacion.setNegativeButton("No", (dialog, which) -> {
                 mostrarMsgToask("Eliminacion cancelada por el usuario...");
@@ -164,8 +181,9 @@ public class MainActivity extends AppCompatActivity {
         try {
             Bundle parametrosAmigos = new Bundle();
             parametrosAmigos.putString("accion", accion);
-            parametrosAmigos.putString("datos", jsonArrayDatosAmigos.getJSONObject(position).toString() );
-
+            if(jsonArrayDatosAmigos.length()>0){
+                parametrosAmigos.putString("datos", jsonArrayDatosAmigos.getJSONObject(position).toString() );
+            }
             Intent agregarAmigos = new Intent(getApplicationContext(), AgregarAmigos.class);
             agregarAmigos.putExtras(parametrosAmigos);
             startActivity(agregarAmigos);
@@ -180,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
             if (datosAmigosCursor.moveToFirst()) {//si hay datos que mostrar
                 jsonObjectDatosAmigos = new JSONObject();
                 JSONObject jsonValueObject = new JSONObject();
+                jsonArrayDatosAmigos = new JSONArray();
                 do {
                     jsonObjectDatosAmigos.put("_id", datosAmigosCursor.getString(0));
                     jsonObjectDatosAmigos.put("_rev", datosAmigosCursor.getString(0));
@@ -189,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
                     jsonObjectDatosAmigos.put("email", datosAmigosCursor.getString(4));
                     jsonObjectDatosAmigos.put("urlPhoto", datosAmigosCursor.getString(5));
                     jsonValueObject.put("value", jsonObjectDatosAmigos);
+
                     jsonArrayDatosAmigos.put(jsonValueObject);
                 } while (datosAmigosCursor.moveToNext());
                 mostrarDatosAmigos();
@@ -215,9 +235,11 @@ public class MainActivity extends AppCompatActivity {
     private void obtenerDatosAmigos(){
         //si tengo internet obtener datos amigos online, sino, obtener datos amigos offline
         if(di.hayConexionInternet()) {
-            mostrarMsgToask("Hay internet, entonces mostrando datos de la nube");
+            mostrarMsgToask("Hay internet, mostrando datos de la nube");
             obtenerDatosAmigosOnLine();
         } else {
+            jsonArrayDatosAmigos = new JSONArray();
+            mostrarMsgToask("NO hay internet, mostrando datos local");
             obtenerDatosAmigosOffLine();
         }
     }
