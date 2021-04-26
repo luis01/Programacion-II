@@ -196,10 +196,11 @@ public class MainActivity extends AppCompatActivity {
             miBD = new DB(getApplicationContext(), "", null, 1);
             datosAmigosCursor = miBD.administracion_amigos("consultar", null);
             if (datosAmigosCursor.moveToFirst()) {//si hay datos que mostrar
-                jsonObjectDatosAmigos = new JSONObject();
-                JSONObject jsonValueObject = new JSONObject();
                 jsonArrayDatosAmigos = new JSONArray();
                 do {
+                    jsonObjectDatosAmigos = new JSONObject();
+                    JSONObject jsonValueObject = new JSONObject();
+
                     jsonObjectDatosAmigos.put("_id", datosAmigosCursor.getString(0));
                     jsonObjectDatosAmigos.put("_rev", datosAmigosCursor.getString(0));
                     jsonObjectDatosAmigos.put("nombre", datosAmigosCursor.getString(1));
