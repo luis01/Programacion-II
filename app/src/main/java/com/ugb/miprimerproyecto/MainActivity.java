@@ -64,32 +64,6 @@ public class MainActivity extends AppCompatActivity {
             uploadPhotoFirestore();
         });
     }
-    private void guardarUsuario(){
-        try{
-            databaseReference = FirebaseDatabase.getInstance().getReference("usuarios");
-            tempVal = findViewById(R.id.txtNombreUsuario);
-            String nombre = tempVal.getText().toString(),
-                key = databaseReference.push().getKey();
-            if( miToken=="" || miToken==null ){
-                obtenerToken();
-            }
-            if( miToken!=null && miToken!="" ){
-                usuarios user = new usuarios(nombre, "luishernandez@ugb.edu.sv", urlCompleteImg, urlCompleteImgFirestore, miToken);
-                if(key!=null){
-                    databaseReference.child(key).setValue(user).addOnSuccessListener(aVoid -> {
-                       mostrarMsgToast("Usuario registrado con exito");
-                    });
-                } else {
-                    mostrarMsgToast("NO insertar el usuario en la base de datos de firebase");
-                }
-            } else{
-                mostrarMsgToast("NO pude obtener el identificar de tu telefono, por favor intentalo mas tarde.");
-            }
-            mostrarMsgToast(miToken);
-        }catch (Exception ex){
-            mostrarMsgToast(ex.getMessage());
-        }
-    }
     void uploadPhotoFirestore(){
         mostrarMsgToast("Subiendo la foto te confirmaremos cuando este listo");
         StorageReference storageReference = FirebaseStorage.getInstance().getReference();
@@ -100,17 +74,43 @@ public class MainActivity extends AppCompatActivity {
         uploadTask.addOnFailureListener(e -> {
             mostrarMsgToast("Fallo el subir la foto al servidor: "+ e.getMessage());
         });
-        uploadTask.addOnSuccessListener(task -> {
-           mostrarMsgToast("Listo la foto se subio correctamente al servidor");
-           Task<Uri> downloadUri = uploadTask.continueWithTask(task1 -> reference.getDownloadUrl());
-        }).addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                urlCompleteImgFirestore = task.getResult().toString();
-                guardarUsuario();
-            } else{
-                mostrarMsgToast("La foto se subio con exito pero no pude obtener su enlace");
-            }
+        uploadTask.addOnSuccessListener(taskSnapshot -> {
+            mostrarMsgToast("Listo la foto se subio correctamente al servidor");
+            Task<Uri> downloadUri = uploadTask.continueWithTask(task -> reference.getDownloadUrl()).addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    urlCompleteImgFirestore = task.getResult().toString();
+                    guardarUsuario();
+                } else{
+                    mostrarMsgToast("La foto se subio con exito pero no pude obtener su enlace");
+                }
+            });
         });
+    }
+    private void guardarUsuario(){
+        try{
+            databaseReference = FirebaseDatabase.getInstance().getReference("usuarios");
+            tempVal = findViewById(R.id.txtNombreUsuario);
+            String nombre = tempVal.getText().toString(),
+                    key = databaseReference.push().getKey();
+            if( miToken=="" || miToken==null ){
+                obtenerToken();
+            }
+            if( miToken!=null && miToken!="" ){
+                usuarios user = new usuarios(nombre, "luishernandez@ugb.edu.sv", urlCompleteImg, urlCompleteImgFirestore, miToken);
+                if(key!=null){
+                    databaseReference.child(key).setValue(user).addOnSuccessListener(aVoid -> {
+                        mostrarMsgToast("Usuario registrado con exito");
+                        mostrarListaUsuarios();
+                    });
+                } else {
+                    mostrarMsgToast("NO se inserto el usuario en la base de datos de firebase");
+                }
+            } else{
+                mostrarMsgToast("NO pude obtener el identificar de tu telefono, por favor intentalo mas tarde.");
+            }
+        }catch (Exception ex){
+            mostrarMsgToast(ex.getMessage());
+        }
     }
     void tomarFoto() {
         imgPhoto = findViewById(R.id.imgPhoto);
@@ -133,7 +133,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }
-
         });
     }
     @Override
@@ -174,5 +173,9 @@ public class MainActivity extends AppCompatActivity {
             }
             miToken = task.getResult();
         });
+    }
+    void mostrarListaUsuarios(){
+        Intent intent = new Intent(getApplicationContext(), lista_usuarios.class);
+        startActivity(intent);
     }
 }
