@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -31,11 +33,11 @@ public class lista_usuarios extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lista_usuarios);
+        ltsUsuarios = findViewById(R.id.ltsUsuarios);
         mostrarListadoUsuarios();
+        mostrarChats();
     }
     void mostrarListadoUsuarios(){
-        ltsUsuarios = findViewById(R.id.ltsUsuarios);
-
         databaseReference = FirebaseDatabase.getInstance().getReference("usuarios");
 
         FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
@@ -96,6 +98,24 @@ public class lista_usuarios extends AppCompatActivity {
                 }
             });
 
+    }
+    void mostrarChats(){
+        ltsUsuarios.setOnItemClickListener((parent, view, position, id) -> {
+            try{
+                Bundle bundle = new Bundle();
+                bundle.putString("user", datosJSONArray.getJSONObject(position).getString("user") );
+                bundle.putString("to", datosJSONArray.getJSONObject(position).getString("to") );
+                bundle.putString("from", datosJSONArray.getJSONObject(position).getString("from") );
+                bundle.putString("urlPhoto", datosJSONArray.getJSONObject(position).getString("urlPhoto") );
+                bundle.putString("urlPhotoFirestore", datosJSONArray.getJSONObject(position).getString("urlPhotoFirestore") );
+
+                Intent intent = new Intent(getApplicationContext(), chats.class);
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }catch (Exception ex){
+                mostrarMsgToast(ex.getMessage());
+            }
+        });
     }
     void registrarUsuarios(){
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
